@@ -15,6 +15,11 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Root endpoint to verify API is live
+app.get('/', (req, res) => {
+  res.json({ status: 'live', message: 'News Pulse API is running successfully' });
+});
+
 // Helper to format ISO timestamp differences
 const formatTimestamp = (ts) => {
   if (!ts) return null;
