@@ -1,7 +1,6 @@
 import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sqlite3 from 'sqlite3';
 import pg from 'pg';
 import dotenv from 'dotenv';
 
@@ -31,6 +30,9 @@ if (dbUrl && (dbUrl.startsWith('postgres://') || dbUrl.startsWith('postgresql://
 } else {
   dbType = 'sqlite';
   const dbPath = path.resolve(__dirname, '../newspulse.db');
+  
+  // Dynamically import sqlite3 only when running locally
+  const sqlite3 = (await import('sqlite3')).default;
   
   sqliteDb = new sqlite3.Database(dbPath, (err) => {
     if (err) {
