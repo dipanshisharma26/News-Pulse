@@ -175,7 +175,9 @@ app.post('/ingest/trigger', async (req, res) => {
     await query(sql, [jobId, 'running']);
     
     // Spawn Python subprocess
-    const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+    const pythonCmd = process.env.NODE_ENV === 'production'
+      ? '/opt/venv/bin/python3'
+      : (process.platform === 'win32' ? 'python' : 'python3');
     const scraperPath = path.resolve(__dirname, '../scraper/ingest.py');
     
     console.log(`Spawning scraper process: ${pythonCmd} ${scraperPath} --job ${jobId}`);
