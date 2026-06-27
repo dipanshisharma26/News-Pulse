@@ -5,6 +5,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { query, getDbType } from './db.js';
+import { seedDatabase } from './seedData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,17 @@ app.use(express.json());
 // Root endpoint to verify API is live
 app.get('/', (req, res) => {
   res.json({ status: 'live', message: 'News Pulse API is running successfully' });
+});
+
+// Seed endpoint to populate mock data
+app.get('/seed', async (req, res) => {
+  try {
+    const result = await seedDatabase();
+    res.json(result);
+  } catch (error) {
+    console.error('Error in /seed endpoint:', error);
+    res.status(500).json({ error: 'Failed to seed database', details: error.message });
+  }
 });
 
 // Helper to format ISO timestamp differences

@@ -38,6 +38,24 @@ function App() {
 
   // Ingestion Job Polling
   const [currentJob, setCurrentJob] = useState(null);
+  const [seeding, setSeeding] = useState(false);
+
+  const handleLoadDemoData = async () => {
+    try {
+      setSeeding(true);
+      setError(null);
+      const res = await fetch(`${API_BASE}/seed`);
+      if (!res.ok) {
+        throw new Error('Failed to seed database');
+      }
+      await fetchData(); // refresh data
+    } catch (err) {
+      console.error(err);
+      setError('Could not seed database. Please check backend connection.');
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   // Fetch initial data
   const fetchData = async () => {
@@ -325,6 +343,28 @@ function App() {
             <RefreshCw size={48} className="spin" style={{ color: 'var(--accent-primary)' }} />
             <h3>Loading news clusters...</h3>
             <p>Parsing dataset and building timeline layout.</p>
+          </div>
+        ) : clusters.length === 0 ? (
+          <div className="glass-panel empty-state" style={{ maxWidth: '600px', margin: '2rem auto' }}>
+            <Database size={48} style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }} />
+            <h3>Database is Empty</h3>
+            <p>No news articles or clusters are currently in your database.</p>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', justifyContent: 'center' }}>
+              <button 
+                className="btn-primary" 
+                onClick={handleLoadDemoData}
+                disabled={seeding}
+              >
+                {seeding ? 'Seeding...' : 'Load Demo News Data'}
+              </button>
+              <button 
+                className="btn-secondary" 
+                onClick={handleTriggerIngest}
+                disabled={currentJob?.status === 'running'}
+              >
+                {currentJob?.status === 'running' ? 'Running Scraper...' : 'Run Real Scraper'}
+              </button>
+            </div>
           </div>
         ) : (
           <>
